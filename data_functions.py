@@ -18,9 +18,11 @@ def get_movies(title):
 
         SELECT ?movie
         WHERE {{
-            ?movie foaf:name|dbp:name|rdfs:label ?g .
-            FILTER regex(?g, "{title}", "i") 
-            FILTER (lang(?g) = 'en')
+            ?movie foaf:name|dbp:name|rdfs:label ?title ;
+            dbo:runtime ?runtime ;
+            dbo:cinematography ?cinematographer .
+            FILTER regex(?title, "{title}", "i") 
+            FILTER (lang(?title) = 'en')
         }} LIMIT 30
         """
 
@@ -36,52 +38,12 @@ def get_movies(title):
         uris.append(o)
         names.append(str(o).split('/')[-1].replace('_', ' '))
 
-    filtered_names, filtered_uris = [], []
+    movies_dict = {}
     for name, uri in zip(names, uris):
-        if "film" in str(uri).lower():
-            filtered_names.append(name)
-            filtered_uris.append(uri)
+        movies_dict[name] = uri
 
-    return filtered_names, filtered_uris
-
-
-def get_movies_strict(title):
-    """
-    This function queries DBpedia using SPARQL to retrieve all movies with a specified title.
-    The exact title has to be inputted in order for the query to work.
-    :param title: the title of a movie
-    :return: a list with movie titles and a list of their URIs
-    """
-
-    query_string = f"""
-        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema/>
-        PREFIX dbo: <http://dbpedia.org/ontology/>
-        PREFIX dbp: <http://dbpedia.org/property/>
-        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-
-        SELECT ?movie
-        WHERE {{
-            ?movie foaf:name|dbp:name|rdfs:label "{title}"@en .
-        }}
-        """
-
-    sparql = SPARQLWrapper("http://lod.openlinksw.com/sparql/")
-    sparql.setReturnFormat(TURTLE)
-    sparql.setQuery(query_string)
-
-    results = sparql.query().convert()
-    graph = Graph().parse(results)
-    result_predicate = URIRef('http://www.w3.org/2005/sparql-results#value')
-    names, uris = [], []
-    for _, _, o in graph.triples((None, result_predicate, None)):
-        uris.append(o)
-        names.append(str(o).split('/')[-1].replace('_', ' '))
-
-    filtered_names, filtered_uris = [], []
-    for name, uri in zip(names, uris):
-        if "film" in str(uri).lower():
-            filtered_names.append(name)
-            filtered_uris.append(uri)
+    filtered_names = list(movies_dict.keys())
+    filtered_uris = list(movies_dict.values())
 
     return filtered_names, filtered_uris
 
@@ -138,7 +100,7 @@ def get_actors(movie_uri):
 
         SELECT ?actor
         WHERE {{
-            <{movie_uri}> dbo:starring|dbp:starring ?actor .
+            <{movie_uri}> dbo:starring ?actor .
         }}
         """
 
@@ -217,7 +179,9 @@ def directed(person_uri):
 
         SELECT ?movie
         WHERE {{
-            ?movie dbo:director|dbp:director <{person_uri}> .
+            ?movie dbo:director|dbp:director <{person_uri}> ;
+            dbo:runtime ?runtime ;
+            dbo:cinematography ?cinematographer .
         }}
         """
 
@@ -233,14 +197,8 @@ def directed(person_uri):
         uris.append(o)
         names.append(str(o).split('/')[-1].replace('_', ' '))
 
-    filtered_names, filtered_uris = [], []
-    for name, uri in zip(names, uris):
-        if "film" in str(uri).lower():
-            filtered_names.append(name)
-            filtered_uris.append(uri)
-
     movies_dict = {}
-    for name, uri in zip(filtered_names, filtered_uris):
+    for name, uri in zip(names, uris):
         movies_dict[name] = uri
 
     filtered_names = list(movies_dict.keys())
@@ -265,7 +223,9 @@ def starred(person_uri):
 
         SELECT ?movie
         WHERE {{
-            ?movie dbo:starring|dbp:starring <{person_uri}> .
+            ?movie dbo:starring|dbp:starring <{person_uri}> ;
+            dbo:runtime ?runtime ;
+            dbo:cinematography ?cinematographer .
         }}
         """
 
@@ -281,14 +241,8 @@ def starred(person_uri):
         uris.append(o)
         names.append(str(o).split('/')[-1].replace('_', ' '))
 
-    filtered_names, filtered_uris = [], []
-    for name, uri in zip(names, uris):
-        if "film" in str(uri).lower():
-            filtered_names.append(name)
-            filtered_uris.append(uri)
-
     movies_dict = {}
-    for name, uri in zip(filtered_names, filtered_uris):
+    for name, uri in zip(names, uris):
         movies_dict[name] = uri
 
     filtered_names = list(movies_dict.keys())

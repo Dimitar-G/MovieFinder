@@ -11,7 +11,7 @@
 
     <h3 class="h3">Directors: </h3>
     {% if director_names_number == 0 %}
-        No directors found.
+        <p>No directors found.</p>
     {% else %}
         <ul>
         {% for director_name, director_uri in director_names_uris %}
@@ -26,7 +26,7 @@
 
     <h3 class="h3">Actors: </h3>
     {% if actor_names_number == 0 %}
-        No actors found.
+        <p>No actors found.</p>
     {% else %}
         <ul>
         {% for actor_name, actor_uri in actor_names_uris %}
