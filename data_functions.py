@@ -305,8 +305,10 @@ def get_people(person_name):
 
         SELECT ?person
         WHERE {{
-            ?person foaf:name|dbp:name|rdfs:label "{person_name}"@en .
+            ?person foaf:name|dbp:name|rdfs:label ?name .
             ?movie dbo:starring|dbp:starring|dbo:director|dbp:director ?person .
+            FILTER regex(?name, "{person_name}", "i") 
+            FILTER (lang(?name) = 'en')
         }}
         """
 
