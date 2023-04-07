@@ -1,0 +1,46 @@
+{% extends 'master_page.html' %}
+{% block content %}
+
+    <h1>{{ person_name }}</h1>
+    <hr />
+
+    {% if bio %}
+        <p>{{ bio }}</p>
+    {% endif %}
+    <hr />
+
+    <h3 class="h3">Director of:</h3>
+    {% if directed_movies_number == 0 %}
+        <p>No directed movies found.</p>
+    {% else %}
+        <ul>
+            {% for movie_name, movie_uri in directed_movie_names_uris %}
+                <li>
+                    <a href="{{ url_for('movie', uri=movie_uri) }}">
+                        <p class="text-info">{{ movie_name }}</p>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h3 class="h3">Actor in:</h3>
+    {% if starred_movies_number == 0 %}
+        <p>No directed movies found.</p>
+    {% else %}
+        <ul>
+            {% for movie_name, movie_uri in starred_movie_names_uris %}
+                <li>
+                    <a href="{{ url_for('movie', uri=movie_uri) }}">
+                        <p class="text-info">{{ movie_name }}</p>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <a href="/">
+        <button class="mt-5 btn btn-info">Search Again</button>
+    </a>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'master_page.html' %}
+{% block content %}
+
+    <h4 class="h4 my-4"> {{ movie_names_number }} search results found. </h4>
+
+    {% if movie_names_number > 0 %}
+        {% for movie_name, movie_uri in movie_names_uris %}
+            <a href="{{ url_for('movie', uri=movie_uri) }}">
+                <h5 class="h5 text-info">{{ movie_name }}</h5>
+            </a>
+        {% endfor %}
+    {% endif %}
+
+    <a href="/">
+        <button class="mt-5 btn btn-info">Search Again</button>
+    </a>
+
+{% endblock %}

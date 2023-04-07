@@ -1,0 +1,29 @@
+
+{% extends 'master_page.html' %}
+{% block content %}
+
+<div class="my-5">
+    <form action="/movies" method="post">
+        <label for="title">Search movie title:</label>
+        <br />
+        <div class="input-group">
+            <input type="text" name="title" value="" class="form-control" placeholder="Example: Titanic">
+            <input type="submit" value="Search" class="btn btn-info">
+        </div>
+    </form>
+</div>
+
+<div class="my-5">
+    <form action="/people" method="post">
+        <label for="person">Search actor/director:</label>
+        <br />
+        <div class="input-group">
+            <input type="text" name="person" value="" class="form-control" placeholder="Example: James Cameron">
+            <input type="submit" value="Search" class="btn btn-info">
+        </div>
+    </form>
+</div>
+
+<p class="text-muted">*Make sure to enter the names and titles correctly.</p>
+
+{% endblock %}
