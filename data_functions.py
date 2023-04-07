@@ -5,6 +5,50 @@ from rdflib import Graph, URIRef
 def get_movies(title):
     """
     This function queries DBpedia using SPARQL to retrieve all movies with a specified title.
+    A part of the title is also efficient for the query to work.
+    :param title: the title of a movie
+    :return: a list with movie titles and a list of their URIs
+    """
+
+    query_string = f"""
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema/>
+        PREFIX dbo: <http://dbpedia.org/ontology/>
+        PREFIX dbp: <http://dbpedia.org/property/>
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+        SELECT ?movie
+        WHERE {{
+            ?movie foaf:name|dbp:name|rdfs:label ?g .
+            FILTER regex(?g, "{title}", "i") 
+            FILTER (lang(?g) = 'en')
+        }} LIMIT 30
+        """
+
+    sparql = SPARQLWrapper("http://lod.openlinksw.com/sparql/")
+    sparql.setReturnFormat(TURTLE)
+    sparql.setQuery(query_string)
+
+    results = sparql.query().convert()
+    graph = Graph().parse(results)
+    result_predicate = URIRef('http://www.w3.org/2005/sparql-results#value')
+    names, uris = [], []
+    for _, _, o in graph.triples((None, result_predicate, None)):
+        uris.append(o)
+        names.append(str(o).split('/')[-1].replace('_', ' '))
+
+    filtered_names, filtered_uris = [], []
+    for name, uri in zip(names, uris):
+        if "film" in str(uri).lower():
+            filtered_names.append(name)
+            filtered_uris.append(uri)
+
+    return filtered_names, filtered_uris
+
+
+def get_movies_strict(title):
+    """
+    This function queries DBpedia using SPARQL to retrieve all movies with a specified title.
+    The exact title has to be inputted in order for the query to work.
     :param title: the title of a movie
     :return: a list with movie titles and a list of their URIs
     """
